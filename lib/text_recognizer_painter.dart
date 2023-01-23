@@ -10,17 +10,40 @@ class TextRecognizerPainter extends CustomPainter {
   TextRecognizerPainter(this.recognizedText, this.absoluteImageSize, this.rotation, this.renderBox, this.getScannedText,
       {this.boxLeftOff = 4, this.boxBottomOff = 2, this.boxRightOff = 4, this.boxTopOff = 2, this.getRawData, this.paintboxCustom});
 
+  /// ML kit recognizer
   final RecognizedText recognizedText;
+
+  /// Image scanned size
   final Size absoluteImageSize;
+
+  /// Image scanned rotation
   final InputImageRotation rotation;
+
+  /// Render box for narrow camera
   final RenderBox renderBox;
+
+  /// Function to get scanned text as a string
   final Function getScannedText;
+
+  /// Scanned text string
   String scannedText = "";
+
+  /// Offset on recalculated image left
   final double boxLeftOff;
+
+  /// Offset on recalculated image bottom
   final double boxBottomOff;
+
+  /// Offset on recalculated image right
   final double boxRightOff;
+
+  /// Offset on recalculated image top
   final double boxTopOff;
+
+  /// Get raw data from scanned image
   final Function? getRawData;
+
+  /// Narower box paint
   final Paint? paintboxCustom;
 
   @override

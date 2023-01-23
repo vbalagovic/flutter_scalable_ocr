@@ -21,13 +21,28 @@ class ScalableOCR extends StatefulWidget {
       this.paintboxCustom})
       : super(key: key);
 
+  /// Offset on recalculated image left
   final double boxLeftOff;
+
+  /// Offset on recalculated image bottom
   final double boxBottomOff;
+
+  /// Offset on recalculated image right
   final double boxRightOff;
+
+  /// Offset on recalculated image top
   final double boxTopOff;
+
+  /// Height of narowed image
   final double? boxHeight;
+
+  /// Function to get scanned text as a string
   final Function getScannedText;
+
+  /// Get raw data from scanned image
   final Function? getRawData;
+
+  /// Narower box paint
   final Paint? paintboxCustom;
 
   @override
@@ -92,6 +107,7 @@ class ScalableOCRState extends State<ScalableOCR> {
         ));
   }
 
+  // Body of live camera stream
   Widget _liveFeedBody() {
     final CameraController? cameraController = _controller;
     if (cameraController == null || !cameraController.value.isInitialized) {
@@ -154,6 +170,7 @@ class ScalableOCRState extends State<ScalableOCR> {
     }
   }
 
+  // Start camera stream function
   Future startLiveFeed() async {
     _cameras = await availableCameras();
     _controller = CameraController(_cameras[0], ResolutionPreset.max);
@@ -190,6 +207,7 @@ class ScalableOCRState extends State<ScalableOCR> {
     });
   }
 
+  // Process image from camera stream
   Future _processCameraImage(CameraImage image) async {
     final WriteBuffer allBytes = WriteBuffer();
     for (final Plane plane in image.planes) {
@@ -228,10 +246,12 @@ class ScalableOCRState extends State<ScalableOCR> {
     processImage(inputImage);
   }
 
+  // Scale image
   void _handleScaleStart(ScaleStartDetails details) {
     _baseScale = _currentScale;
   }
 
+  // Handle scale update
   Future<void> _handleScaleUpdate(ScaleUpdateDetails details) async {
     // When there are not exactly two fingers on screen don't scale
     if (_controller == null) {
@@ -243,6 +263,7 @@ class ScalableOCRState extends State<ScalableOCR> {
     await _controller!.setZoomLevel(_currentScale);
   }
 
+  // Focus image
   void onViewFinderTap(TapDownDetails details, BoxConstraints constraints) {
     if (_controller == null) {
       return;
@@ -258,12 +279,14 @@ class ScalableOCRState extends State<ScalableOCR> {
     cameraController.setFocusPoint(offset);
   }
 
+  // Stop camera live stream
   Future _stopLiveFeed() async {
     await _controller?.stopImageStream();
     await _controller?.dispose();
     _controller = null;
   }
 
+  // Process image
   Future<void> processImage(InputImage inputImage) async {
     if (!_canProcess) return;
     if (_isBusy) return;

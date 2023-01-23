@@ -4,6 +4,7 @@ import 'dart:ui';
 // ignore: depend_on_referenced_packages
 import 'package:google_mlkit_commons/google_mlkit_commons.dart';
 
+// Get translated x point against image size
 double translateX(
     double x, InputImageRotation rotation, Size size, Size absoluteImageSize) {
   switch (rotation) {
@@ -23,6 +24,7 @@ double translateX(
   }
 }
 
+// Get translated y point against image size
 double translateY(
     double y, InputImageRotation rotation, Size size, Size absoluteImageSize) {
   switch (rotation) {
