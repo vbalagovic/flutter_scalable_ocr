@@ -9,6 +9,10 @@ Flutter scalable OCR package is a wrapper around [Google ML kit Text Recognition
   <img src="https://user-images.githubusercontent.com/30495155/214034570-c305c19b-3d81-4a09-8e54-f395916f065e.gif" width="300" />
 </p>
 
+## Requirements
+
+Since thus package uses [ML Kit](https://pub.dev/packages/google_mlkit_commons) check [requirements](https://github.com/bharat-biradar/Google-Ml-Kit-plugin#requirements) before running the package in project.
+
 ## Features
 
 Scan text from narow window of camera and not whole screen. There are two function `getScannedText` to fetch readed text as a string, or `getRawData` which returns list of `TextElement` consult [ML Kit Text Recognition](https://developers.google.com/ml-kit/vision/text-recognition) objects as from followin structure from google developer site image. Pinch and zoom should also work:
