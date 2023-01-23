@@ -5,7 +5,7 @@ homepage: https://github.com/vbalagovic/flutter_scalable_ocr.git
 
 environment:
   sdk: '>=2.14.4 <3.0.0'
-  flutter: ">=1.17.0"
+  flutter: ">=1.20.0"
 
 dependencies:
   camera: ^0.10.2+1
