@@ -9,3 +9,7 @@ Updated min sdk versions
 ## 1.0.0
 
 Stable release
+
+## 1.0.1
+
+Added spacing between words on String output

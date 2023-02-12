@@ -91,7 +91,9 @@ class ScalableOCRState extends State<ScalableOCR> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              _controller == null || _controller?.value == null || _controller?.value.isInitialized == false
+              _controller == null ||
+                      _controller?.value == null ||
+                      _controller?.value.isInitialized == false
                   ? Container(
                       width: MediaQuery.of(context).size.width,
                       height: sizeH * 19,
@@ -123,18 +125,23 @@ class ScalableOCRState extends State<ScalableOCR> {
           children: <Widget>[
             Center(
               child: SizedBox(
-                height: widget.boxHeight ?? MediaQuery.of(context).size.height / 5,
+                height:
+                    widget.boxHeight ?? MediaQuery.of(context).size.height / 5,
                 key: cameraPrev,
                 child: AspectRatio(
                   aspectRatio: 1 / previewAspectRatio,
                   child: GestureDetector(
                     behavior: HitTestBehavior.translucent,
                     child: ClipRRect(
-                      borderRadius: const BorderRadius.all(Radius.circular(16.0)),
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(16.0)),
                       child: Transform.scale(
-                        scale: cameraController.value.aspectRatio / previewAspectRatio,
+                        scale: cameraController.value.aspectRatio /
+                            previewAspectRatio,
                         child: Center(
-                          child: CameraPreview(cameraController, child: LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
+                          child: CameraPreview(cameraController, child:
+                              LayoutBuilder(builder: (BuildContext context,
+                                  BoxConstraints constraints) {
                             maxWidth = constraints.maxWidth;
                             maxHeight = constraints.maxHeight;
 
@@ -142,7 +149,8 @@ class ScalableOCRState extends State<ScalableOCR> {
                               behavior: HitTestBehavior.opaque,
                               onScaleStart: _handleScaleStart,
                               onScaleUpdate: _handleScaleUpdate,
-                              onTapDown: (TapDownDetails details) => onViewFinderTap(details, constraints),
+                              onTapDown: (TapDownDetails details) =>
+                                  onViewFinderTap(details, constraints),
                             );
                           })),
                         ),
@@ -153,14 +161,16 @@ class ScalableOCRState extends State<ScalableOCR> {
               ),
             ),
             if (customPaint != null)
-              LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
+              LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) {
                 maxWidth = constraints.maxWidth;
                 maxHeight = constraints.maxHeight;
                 return GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onScaleStart: _handleScaleStart,
                   onScaleUpdate: _handleScaleUpdate,
-                  onTapDown: (TapDownDetails details) => onViewFinderTap(details, constraints),
+                  onTapDown: (TapDownDetails details) =>
+                      onViewFinderTap(details, constraints),
                   child: customPaint!,
                 );
               }),
@@ -215,13 +225,16 @@ class ScalableOCRState extends State<ScalableOCR> {
     }
     final bytes = allBytes.done().buffer.asUint8List();
 
-    final Size imageSize = Size(image.width.toDouble(), image.height.toDouble());
+    final Size imageSize =
+        Size(image.width.toDouble(), image.height.toDouble());
 
     final camera = _cameras[0];
-    final imageRotation = InputImageRotationValue.fromRawValue(camera.sensorOrientation);
+    final imageRotation =
+        InputImageRotationValue.fromRawValue(camera.sensorOrientation);
     if (imageRotation == null) return;
 
-    final inputImageFormat = InputImageFormatValue.fromRawValue(image.format.raw);
+    final inputImageFormat =
+        InputImageFormatValue.fromRawValue(image.format.raw);
     if (inputImageFormat == null) return;
 
     final planeData = image.planes.map(
@@ -241,7 +254,8 @@ class ScalableOCRState extends State<ScalableOCR> {
       planeData: planeData,
     );
 
-    final inputImage = InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
+    final inputImage =
+        InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
 
     processImage(inputImage);
   }
@@ -258,7 +272,8 @@ class ScalableOCRState extends State<ScalableOCR> {
       return;
     }
 
-    _currentScale = (_baseScale * details.scale).clamp(_minAvailableZoom, _maxAvailableZoom);
+    _currentScale = (_baseScale * details.scale)
+        .clamp(_minAvailableZoom, _maxAvailableZoom);
 
     await _controller!.setZoomLevel(_currentScale);
   }
@@ -293,17 +308,28 @@ class ScalableOCRState extends State<ScalableOCR> {
     _isBusy = true;
 
     final recognizedText = await _textRecognizer.processImage(inputImage);
-    if (inputImage.inputImageData?.size != null && inputImage.inputImageData?.imageRotation != null && cameraPrev.currentContext != null) {
-      final RenderBox renderBox = cameraPrev.currentContext?.findRenderObject() as RenderBox;
+    if (inputImage.inputImageData?.size != null &&
+        inputImage.inputImageData?.imageRotation != null &&
+        cameraPrev.currentContext != null) {
+      final RenderBox renderBox =
+          cameraPrev.currentContext?.findRenderObject() as RenderBox;
 
-      var painter =
-          TextRecognizerPainter(recognizedText, inputImage.inputImageData!.size, inputImage.inputImageData!.imageRotation, renderBox, (value) {
+      var painter = TextRecognizerPainter(
+          recognizedText,
+          inputImage.inputImageData!.size,
+          inputImage.inputImageData!.imageRotation,
+          renderBox, (value) {
         widget.getScannedText(value);
       }, getRawData: (value) {
         if (widget.getRawData != null) {
           widget.getRawData!(value);
         }
-      }, boxBottomOff: widget.boxBottomOff, boxTopOff: widget.boxTopOff, boxRightOff: widget.boxRightOff, boxLeftOff: widget.boxRightOff, paintboxCustom: widget.paintboxCustom);
+      },
+          boxBottomOff: widget.boxBottomOff,
+          boxTopOff: widget.boxTopOff,
+          boxRightOff: widget.boxRightOff,
+          boxLeftOff: widget.boxRightOff,
+          paintboxCustom: widget.paintboxCustom);
 
       customPaint = CustomPaint(painter: painter);
     } else {
