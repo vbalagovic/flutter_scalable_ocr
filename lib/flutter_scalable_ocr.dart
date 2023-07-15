@@ -239,30 +239,12 @@ class ScalableOCRState extends State<ScalableOCR> {
         InputImageFormatValue.fromRawValue(image.format.raw);
     if (inputImageFormat == null) return;
 
-    // final planeData = image.planes.map(
-    //   (Plane plane) {
-    //     return InputImageMetadata(
-    //       size: imageSize,
-    //       rotation: imageRotation,
-    //       format: inputImageFormat,
-    //       bytesPerRow: plane.bytesPerRow,
-    //     );
-    //   },
-    // );
-
     final planeData = InputImageMetadata(
       size: imageSize,
       rotation: imageRotation,
       format: inputImageFormat,
       bytesPerRow: image.planes[0].bytesPerRow,
     );
-
-    // final inputImageData = InputImageData(
-    //   size: imageSize,
-    //   imageRotation: imageRotation,
-    //   inputImageFormat: inputImageFormat,
-    //   planeData: planeData,
-    // );
 
     final inputImage =
         // InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
