@@ -4,10 +4,12 @@ import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+// import 'package:satya_textocr/src_path/SatyaTextKit.dart';
 import './text_recognizer_painter.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:camera/camera.dart';
 
+// import 'package:satya_textocr/satya_textocr.dart';
 class ScalableOCR extends StatefulWidget {
   const ScalableOCR(
       {Key? key,
@@ -46,7 +48,7 @@ class ScalableOCR extends StatefulWidget {
   final Paint? paintboxCustom;
 
   @override
-  ScalableOCRState createState() => ScalableOCRState();
+  ScalableOCRState get createState => ScalableOCRState();
 }
 
 class ScalableOCRState extends State<ScalableOCR> {
@@ -237,25 +239,34 @@ class ScalableOCRState extends State<ScalableOCR> {
         InputImageFormatValue.fromRawValue(image.format.raw);
     if (inputImageFormat == null) return;
 
-    final planeData = image.planes.map(
-      (Plane plane) {
-        return InputImagePlaneMetadata(
-          bytesPerRow: plane.bytesPerRow,
-          height: plane.height,
-          width: plane.width,
-        );
-      },
-    ).toList();
+    // final planeData = image.planes.map(
+    //   (Plane plane) {
+    //     return InputImageMetadata(
+    //       size: imageSize,
+    //       rotation: imageRotation,
+    //       format: inputImageFormat,
+    //       bytesPerRow: plane.bytesPerRow,
+    //     );
+    //   },
+    // );
 
-    final inputImageData = InputImageData(
+    final planeData = InputImageMetadata(
       size: imageSize,
-      imageRotation: imageRotation,
-      inputImageFormat: inputImageFormat,
-      planeData: planeData,
+      rotation: imageRotation,
+      format: inputImageFormat,
+      bytesPerRow: image.planes[0].bytesPerRow,
     );
 
+    // final inputImageData = InputImageData(
+    //   size: imageSize,
+    //   imageRotation: imageRotation,
+    //   inputImageFormat: inputImageFormat,
+    //   planeData: planeData,
+    // );
+
     final inputImage =
-        InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
+        // InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
+        InputImage.fromBytes(bytes: bytes, metadata: planeData);
 
     processImage(inputImage);
   }
@@ -308,16 +319,16 @@ class ScalableOCRState extends State<ScalableOCR> {
     _isBusy = true;
 
     final recognizedText = await _textRecognizer.processImage(inputImage);
-    if (inputImage.inputImageData?.size != null &&
-        inputImage.inputImageData?.imageRotation != null &&
+    if (inputImage.metadata?.size != null &&
+        inputImage.metadata?.rotation != null &&
         cameraPrev.currentContext != null) {
       final RenderBox renderBox =
           cameraPrev.currentContext?.findRenderObject() as RenderBox;
 
       var painter = TextRecognizerPainter(
           recognizedText,
-          inputImage.inputImageData!.size,
-          inputImage.inputImageData!.imageRotation,
+          inputImage.metadata!.size,
+          inputImage.metadata!.rotation,
           renderBox, (value) {
         widget.getScannedText(value);
       }, getRawData: (value) {

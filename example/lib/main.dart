@@ -31,7 +31,7 @@ class MyHomePage extends StatefulWidget {
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<MyHomePage> get createState => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
@@ -76,8 +76,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   }),
               StreamBuilder<String>(
                 stream: controller.stream,
-                builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-                  return Result(text: snapshot.data != null ? snapshot.data! : "");
+                builder:
+                    (BuildContext context, AsyncSnapshot<String> snapshot) {
+                  return Result(
+                      text: snapshot.data != null ? snapshot.data! : "");
                 },
               )
             ],
