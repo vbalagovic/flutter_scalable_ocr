@@ -93,10 +93,10 @@ class TextRecognizerPainter extends CustomPainter {
         size,
         absoluteImageSize);
 
-    final Paint paintbox = paintboxCustom ?? Paint()
+    final Paint paintbox = paintboxCustom ?? (Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0
-      ..color = const Color.fromARGB(153, 102, 160, 241);
+      ..color = const Color.fromARGB(153, 102, 160, 241));
     canvas.drawRect(
       Rect.fromLTRB(boxLeft, boxTop, boxRight, boxBottom),
       paintbox,
