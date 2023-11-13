@@ -48,7 +48,7 @@ class ScalableOCR extends StatefulWidget {
   final Paint? paintboxCustom;
 
   @override
-  ScalableOCRState get createState => ScalableOCRState();
+  ScalableOCRState createState() => ScalableOCRState();
 }
 
 class ScalableOCRState extends State<ScalableOCR> {
