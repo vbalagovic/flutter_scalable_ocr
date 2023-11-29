@@ -2,26 +2,29 @@ library flutter_scalable_ocr;
 
 import 'dart:developer';
 
+import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+
 // import 'package:satya_textocr/src_path/SatyaTextKit.dart';
 import './text_recognizer_painter.dart';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
-import 'package:camera/camera.dart';
 
 // import 'package:satya_textocr/satya_textocr.dart';
 class ScalableOCR extends StatefulWidget {
-  const ScalableOCR(
-      {Key? key,
-      this.boxLeftOff = 4,
-      this.boxRightOff = 4,
-      this.boxBottomOff = 2.7,
-      this.boxTopOff = 2.7,
-      this.boxHeight,
-      required this.getScannedText,
-      this.getRawData,
-      this.paintboxCustom})
-      : super(key: key);
+  const ScalableOCR({
+    Key? key,
+    this.boxLeftOff = 4,
+    this.boxRightOff = 4,
+    this.boxBottomOff = 2.7,
+    this.boxTopOff = 2.7,
+    this.centerRadius = Radius.zero,
+    this.boxHeight,
+    required this.getScannedText,
+    this.getRawData,
+    this.paintboxCustom,
+    this.cameraMarginColor,
+  }) : super(key: key);
 
   /// Offset on recalculated image left
   final double boxLeftOff;
@@ -35,6 +38,9 @@ class ScalableOCR extends StatefulWidget {
   /// Offset on recalculated image top
   final double boxTopOff;
 
+  /// Radius of center RRect
+  final Radius centerRadius;
+
   /// Height of narowed image
   final double? boxHeight;
 
@@ -46,6 +52,9 @@ class ScalableOCR extends StatefulWidget {
 
   /// Narower box paint
   final Paint? paintboxCustom;
+
+  /// Color of camera margin
+  final Color? cameraMarginColor;
 
   @override
   ScalableOCRState createState() => ScalableOCRState();
@@ -60,10 +69,11 @@ class ScalableOCRState extends State<ScalableOCR> {
   bool _isBusy = false;
   bool converting = false;
   CustomPaint? customPaint;
-  // String? _text;
   CameraController? _controller;
   late List<CameraDescription> _cameras;
-  double zoomLevel = 3.0, minZoomLevel = 0.0, maxZoomLevel = 10.0;
+  double zoomLevel = 3.0;
+  double minZoomLevel = 0.0;
+  double maxZoomLevel = 10.0;
   // Counting pointers (number of user fingers on screen)
   final double _minAvailableZoom = 1.0;
   final double _maxAvailableZoom = 10.0;
@@ -71,7 +81,6 @@ class ScalableOCRState extends State<ScalableOCR> {
   double _baseScale = 3.0;
   double maxWidth = 0;
   double maxHeight = 0;
-  String convertingAmount = "";
 
   @override
   void initState() {
@@ -87,84 +96,54 @@ class ScalableOCRState extends State<ScalableOCR> {
 
   @override
   Widget build(BuildContext context) {
-    double sizeH = MediaQuery.of(context).size.height / 100;
-    return Padding(
-        padding: EdgeInsets.all(sizeH * 3),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              _controller == null ||
-                      _controller?.value == null ||
-                      _controller?.value.isInitialized == false
-                  ? Container(
-                      width: MediaQuery.of(context).size.width,
-                      height: sizeH * 19,
-                      decoration: BoxDecoration(
-                        color: Colors.grey,
-                        borderRadius: BorderRadius.circular(17),
-                      ),
-                    )
-                  : _liveFeedBody(),
-              SizedBox(height: sizeH * 2),
-            ],
-          ),
-        ));
+    return _liveFeedBody();
   }
 
   // Body of live camera stream
   Widget _liveFeedBody() {
-    final CameraController? cameraController = _controller;
-    if (cameraController == null || !cameraController.value.isInitialized) {
-      return const Text('Tap a camera');
-    } else {
-      const double previewAspectRatio = 0.5;
-      return SizedBox(
-        height: widget.boxHeight ?? MediaQuery.of(context).size.height / 5,
-        child: Stack(
-          alignment: Alignment.topCenter,
-          clipBehavior: Clip.none,
-          fit: StackFit.expand,
-          children: <Widget>[
-            Center(
-              child: SizedBox(
-                height:
-                    widget.boxHeight ?? MediaQuery.of(context).size.height / 5,
-                key: cameraPrev,
-                child: AspectRatio(
-                  aspectRatio: 1 / previewAspectRatio,
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.translucent,
-                    child: ClipRRect(
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(16.0)),
-                      child: Transform.scale(
-                        scale: cameraController.value.aspectRatio /
-                            previewAspectRatio,
-                        child: Center(
-                          child: CameraPreview(cameraController, child:
-                              LayoutBuilder(builder: (BuildContext context,
-                                  BoxConstraints constraints) {
-                            maxWidth = constraints.maxWidth;
-                            maxHeight = constraints.maxHeight;
-
-                            return GestureDetector(
-                              behavior: HitTestBehavior.opaque,
-                              onScaleStart: _handleScaleStart,
-                              onScaleUpdate: _handleScaleUpdate,
-                              onTapDown: (TapDownDetails details) =>
-                                  onViewFinderTap(details, constraints),
-                            );
-                          })),
-                        ),
-                      ),
-                    ),
+    final bool isNotInitializedCamera = _controller == null ||
+        _controller?.value == null ||
+        _controller?.value.isInitialized == false;
+    if (isNotInitializedCamera) {
+      return SizedBox.shrink();
+    }
+    const double previewAspectRatio = 0.5;
+    return SizedBox(
+      height: widget.boxHeight ?? MediaQuery.of(context).size.height / 5,
+      child: Stack(
+        key: cameraPrev,
+        alignment: Alignment.topCenter,
+        clipBehavior: Clip.none,
+        fit: StackFit.expand,
+        children: <Widget>[
+          GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            child: Transform.scale(
+              scale: _controller!.value.aspectRatio / previewAspectRatio,
+              child: Center(
+                child: CameraPreview(
+                  _controller!,
+                  child: LayoutBuilder(
+                    builder:
+                        (BuildContext context, BoxConstraints constraints) {
+                      maxWidth = constraints.maxWidth;
+                      maxHeight = constraints.maxHeight;
+                      return GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onScaleStart: _handleScaleStart,
+                        onScaleUpdate: _handleScaleUpdate,
+                        onTapDown: (TapDownDetails details) =>
+                            onViewFinderTap(details, constraints),
+                      );
+                    },
                   ),
                 ),
               ),
             ),
-            if (customPaint != null)
-              LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints constraints) {
+          ),
+          if (customPaint != null)
+            LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) {
                 maxWidth = constraints.maxWidth;
                 maxHeight = constraints.maxHeight;
                 return GestureDetector(
@@ -175,11 +154,11 @@ class ScalableOCRState extends State<ScalableOCR> {
                       onViewFinderTap(details, constraints),
                   child: customPaint!,
                 );
-              }),
-          ],
-        ),
-      );
-    }
+              },
+            ),
+        ],
+      ),
+    );
   }
 
   // Start camera stream function
@@ -301,41 +280,49 @@ class ScalableOCRState extends State<ScalableOCR> {
     _isBusy = true;
 
     final recognizedText = await _textRecognizer.processImage(inputImage);
-    if (inputImage.metadata?.size != null &&
-        inputImage.metadata?.rotation != null &&
-        cameraPrev.currentContext != null) {
+    final bool isImageMetadataAvailable = inputImage.metadata?.size != null &&
+        inputImage.metadata?.rotation != null;
+    final bool isCameraContextAvailable = cameraPrev.currentContext != null;
+    if (isImageMetadataAvailable && isCameraContextAvailable) {
       final RenderBox renderBox =
           cameraPrev.currentContext?.findRenderObject() as RenderBox;
 
-      var painter = TextRecognizerPainter(
-          recognizedText,
-          inputImage.metadata!.size,
-          inputImage.metadata!.rotation,
-          renderBox, (value) {
-        widget.getScannedText(value);
-      }, getRawData: (value) {
-        if (widget.getRawData != null) {
-          widget.getRawData!(value);
-        }
-      },
-          boxBottomOff: widget.boxBottomOff,
-          boxTopOff: widget.boxTopOff,
-          boxRightOff: widget.boxRightOff,
-          boxLeftOff: widget.boxRightOff,
-          paintboxCustom: widget.paintboxCustom);
+      final painter = TextRecognizerPainter(
+        recognizedText,
+        inputImage.metadata!.size,
+        inputImage.metadata!.rotation,
+        renderBox,
+        (value) {
+          widget.getScannedText(value);
+        },
+        getRawData: (value) {
+          if (widget.getRawData != null) {
+            widget.getRawData!(value);
+          }
+        },
+        widget.centerRadius,
+        boxBottomOff: widget.boxBottomOff,
+        boxTopOff: widget.boxTopOff,
+        boxRightOff: widget.boxRightOff,
+        boxLeftOff: widget.boxRightOff,
+        paintboxCustom: widget.paintboxCustom,
+        cameraMarginColor: widget.cameraMarginColor,
+      );
 
       customPaint = CustomPaint(painter: painter);
     } else {
       customPaint = null;
     }
-    Future.delayed(const Duration(milliseconds: 900)).then((value) {
-      if (!converting) {
-        _isBusy = false;
-      }
+    Future.delayed(const Duration(milliseconds: 900)).then(
+      (value) {
+        if (!converting) {
+          _isBusy = false;
+        }
 
-      if (mounted) {
-        setState(() {});
-      }
-    });
+        if (mounted) {
+          setState(() {});
+        }
+      },
+    );
   }
 }
