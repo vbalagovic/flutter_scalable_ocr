@@ -196,6 +196,7 @@ class ScalableOCRState extends State<ScalableOCR> {
       if (!mounted) {
         return;
       }
+      _controller?.lockCaptureOrientation();
       _controller?.getMinZoomLevel().then((value) {
         zoomLevel = value;
         minZoomLevel = value;
@@ -217,6 +218,65 @@ class ScalableOCRState extends State<ScalableOCR> {
         }
       }
     });
+  }
+
+  // Toggle camera flash
+
+  void toggleTorch() {
+    if (_controller != null) {
+      if (_controller!.value.flashMode == FlashMode.torch) {
+        _controller!.setFlashMode(FlashMode.off);
+      } else
+        _controller!.setFlashMode(FlashMode.torch);
+    }
+  }
+
+  //switch camera
+  void switchCamera() {
+    if (!mounted) {
+      return;
+    }
+    if (_controller != null) {
+      if (_controller!.description.lensDirection == CameraLensDirection.front) {
+        _controller = CameraController(
+          _cameras[1],
+          ResolutionPreset.high,
+          enableAudio: false,
+        );
+      } else {
+        _controller = CameraController(
+          _cameras[0],
+          ResolutionPreset.high,
+          enableAudio: false,
+        );
+      }
+      _controller?.initialize().then((_) {
+        if (!mounted) {
+          return;
+        }
+        _controller?.lockCaptureOrientation();
+        _controller?.getMinZoomLevel().then((value) {
+          zoomLevel = value;
+          minZoomLevel = value;
+        });
+        _controller?.getMaxZoomLevel().then((value) {
+          maxZoomLevel = value;
+        });
+        _controller?.startImageStream(_processCameraImage);
+        setState(() {});
+      }).catchError((Object e) {
+        if (e is CameraException) {
+          switch (e.code) {
+            case 'CameraAccessDenied':
+              log('User denied camera access.');
+              break;
+            default:
+              log('Handle other errors.');
+              break;
+          }
+        }
+      });
+    }
   }
 
   // Process image from camera stream
