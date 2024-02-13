@@ -20,7 +20,10 @@ class ScalableOCR extends StatefulWidget {
       this.boxHeight,
       required this.getScannedText,
       this.getRawData,
-      this.paintboxCustom})
+      this.paintboxCustom,
+      this.cameraSelection = 0,
+      this.torchOn,
+      this.lockCamera = true})
       : super(key: key);
 
   /// Offset on recalculated image left
@@ -35,7 +38,7 @@ class ScalableOCR extends StatefulWidget {
   /// Offset on recalculated image top
   final double boxTopOff;
 
-  /// Height of narowed image
+  /// Height of narrowed image
   final double? boxHeight;
 
   /// Function to get scanned text as a string
@@ -44,8 +47,17 @@ class ScalableOCR extends StatefulWidget {
   /// Get raw data from scanned image
   final Function? getRawData;
 
-  /// Narower box paint
+  /// Narrower box paint
   final Paint? paintboxCustom;
+
+  /// Function to toggle torch
+  final bool? torchOn;
+
+  /// Camera Selection
+  final int cameraSelection;
+
+  /// Lock camera orientation
+  final bool lockCamera;
 
   @override
   ScalableOCRState createState() => ScalableOCRState();
@@ -185,8 +197,9 @@ class ScalableOCRState extends State<ScalableOCR> {
   // Start camera stream function
   Future startLiveFeed() async {
     _cameras = await availableCameras();
-    _controller = CameraController(_cameras[0], ResolutionPreset.max);
-    final camera = _cameras[0];
+    _controller = CameraController(
+        _cameras[widget.cameraSelection], ResolutionPreset.max);
+    final camera = _cameras[widget.cameraSelection];
     _controller = CameraController(
       camera,
       ResolutionPreset.high,
@@ -196,7 +209,20 @@ class ScalableOCRState extends State<ScalableOCR> {
       if (!mounted) {
         return;
       }
-      _controller?.lockCaptureOrientation();
+      if (widget.lockCamera == true) {
+        _controller?.unlockCaptureOrientation();
+      }
+
+      if (_controller != null) {
+        if (widget.torchOn != null) {
+          if (widget.torchOn == true) {
+            _controller!.setFlashMode(FlashMode.off);
+          } else {
+            _controller!.setFlashMode(FlashMode.torch);
+          }
+        }
+      }
+
       _controller?.getMinZoomLevel().then((value) {
         zoomLevel = value;
         minZoomLevel = value;
@@ -218,65 +244,6 @@ class ScalableOCRState extends State<ScalableOCR> {
         }
       }
     });
-  }
-
-  // Toggle camera flash
-
-  void toggleTorch() {
-    if (_controller != null) {
-      if (_controller!.value.flashMode == FlashMode.torch) {
-        _controller!.setFlashMode(FlashMode.off);
-      } else
-        _controller!.setFlashMode(FlashMode.torch);
-    }
-  }
-
-  //switch camera
-  void switchCamera() {
-    if (!mounted) {
-      return;
-    }
-    if (_controller != null) {
-      if (_controller!.description.lensDirection == CameraLensDirection.front) {
-        _controller = CameraController(
-          _cameras[1],
-          ResolutionPreset.high,
-          enableAudio: false,
-        );
-      } else {
-        _controller = CameraController(
-          _cameras[0],
-          ResolutionPreset.high,
-          enableAudio: false,
-        );
-      }
-      _controller?.initialize().then((_) {
-        if (!mounted) {
-          return;
-        }
-        _controller?.lockCaptureOrientation();
-        _controller?.getMinZoomLevel().then((value) {
-          zoomLevel = value;
-          minZoomLevel = value;
-        });
-        _controller?.getMaxZoomLevel().then((value) {
-          maxZoomLevel = value;
-        });
-        _controller?.startImageStream(_processCameraImage);
-        setState(() {});
-      }).catchError((Object e) {
-        if (e is CameraException) {
-          switch (e.code) {
-            case 'CameraAccessDenied':
-              log('User denied camera access.');
-              break;
-            default:
-              log('Handle other errors.');
-              break;
-          }
-        }
-      });
-    }
   }
 
   // Process image from camera stream
