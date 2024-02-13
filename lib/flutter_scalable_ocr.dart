@@ -210,6 +210,8 @@ class ScalableOCRState extends State<ScalableOCR> {
         return;
       }
       if (widget.lockCamera == true) {
+        _controller?.lockCaptureOrientation();
+      } else {
         _controller?.unlockCaptureOrientation();
       }
 
