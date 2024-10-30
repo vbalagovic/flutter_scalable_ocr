@@ -17,3 +17,11 @@ Added spacing between words on String output
 ## 2.0.0
 
 Migrate to dart 3, updated ml kit with support for new languages
+
+## 2.1.0
+
+Migrate to support flutrer 3.24.3, upgraded ML kit version, added torch and switch camera option
+
+## 2.2.0
+
+Updated formatting

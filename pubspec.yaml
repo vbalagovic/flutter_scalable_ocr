@@ -1,6 +1,6 @@
 name: flutter_scalable_ocr
 description: Flutter scalable OCR package is a wrapper around google_mlkit_text_recognition where you can partialy select part of camera which text will be processed of.
-version: 2.0.0
+version: 2.2.0
 homepage: https://github.com/vbalagovic/flutter_scalable_ocr.git
 
 environment:
@@ -13,7 +13,6 @@ dependencies:
     sdk: flutter
   google_mlkit_commons: ^0.7.1
   google_mlkit_text_recognition: ^0.13.0
-  # satya_textocr: ^0.0.2
 
 dev_dependencies:
   flutter_test:

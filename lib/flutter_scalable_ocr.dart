@@ -4,12 +4,10 @@ import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-// import 'package:satya_textocr/src_path/SatyaTextKit.dart';
 import './text_recognizer_painter.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:camera/camera.dart';
 
-// import 'package:satya_textocr/satya_textocr.dart';
 class ScalableOCR extends StatefulWidget {
   const ScalableOCR(
       {Key? key,
@@ -93,7 +91,7 @@ class ScalableOCRState extends State<ScalableOCR> {
 
   @override
   void dispose() {
-    _stopLiveFeed();
+    stopLiveFeed();
     super.dispose();
   }
 
@@ -110,7 +108,7 @@ class ScalableOCRState extends State<ScalableOCR> {
                       _controller?.value.isInitialized == false
                   ? Container(
                       width: MediaQuery.of(context).size.width,
-                      height: sizeH * 19,
+                      height: widget.boxHeight ?? sizeH * 19,
                       decoration: BoxDecoration(
                         color: Colors.grey,
                         borderRadius: BorderRadius.circular(17),
@@ -218,9 +216,9 @@ class ScalableOCRState extends State<ScalableOCR> {
       if (_controller != null) {
         if (widget.torchOn != null) {
           if (widget.torchOn == true) {
-            _controller!.setFlashMode(FlashMode.off);
-          } else {
             _controller!.setFlashMode(FlashMode.torch);
+          } else {
+            _controller!.setFlashMode(FlashMode.off);
           }
         }
       }
@@ -317,7 +315,7 @@ class ScalableOCRState extends State<ScalableOCR> {
   }
 
   // Stop camera live stream
-  Future _stopLiveFeed() async {
+  Future stopLiveFeed() async {
     await _controller?.stopImageStream();
     await _controller?.dispose();
     _controller = null;
