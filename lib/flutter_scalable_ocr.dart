@@ -64,7 +64,7 @@ class ScalableOCR extends StatefulWidget {
 }
 
 class ScalableOCRState extends State<ScalableOCR> {
-  final TextRecognizer _textRecognizer = TextRecognizer();
+  final TextRecognizer _textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
   final cameraPrev = GlobalKey();
   final thePainter = GlobalKey();
 
@@ -204,6 +204,9 @@ class ScalableOCRState extends State<ScalableOCR> {
       camera,
       ResolutionPreset.high,
       enableAudio: false,
+      imageFormatGroup: Platform.isAndroid
+          ? ImageFormatGroup.nv21 // for Android
+          : ImageFormatGroup.bgra8888, // for iOS
     );
     _controller?.initialize().then((_) {
       if (!mounted) {
@@ -268,9 +271,9 @@ class ScalableOCRState extends State<ScalableOCR> {
     final camera = _cameras[0];
 
     final sensorOrientation = camera.sensorOrientation;
-    InputImageRotation? rotation;
+    InputImageRotation? imageRotation;
     if (Platform.isIOS) {
-      rotation = InputImageRotationValue.fromRawValue(sensorOrientation);
+      imageRotation = InputImageRotationValue.fromRawValue(sensorOrientation);
     } else if (Platform.isAndroid) {
       var rotationCompensation = _orientations[_controller!.value.deviceOrientation];
       if (rotationCompensation == null) return null;
@@ -281,27 +284,27 @@ class ScalableOCRState extends State<ScalableOCR> {
         // back-facing
         rotationCompensation = (sensorOrientation - rotationCompensation + 360) % 360;
       }
-      rotation = InputImageRotationValue.fromRawValue(rotationCompensation);
+      imageRotation = InputImageRotationValue.fromRawValue(rotationCompensation);
     }
-    if (rotation == null) return null;
+    if (imageRotation == null) return null;
 
     // get image format
-    final format = InputImageFormatValue.fromRawValue(image.format.raw);
+    final imageFormat = InputImageFormatValue.fromRawValue(image.format.raw);
     // validate format depending on platform
     // only supported formats:
     // * nv21 for Android
     // * bgra8888 for iOS
-    if (format == null ||
-        (Platform.isAndroid && format != InputImageFormat.nv21) ||
-        (Platform.isIOS && format != InputImageFormat.bgra8888)) return null;
+    if (imageFormat == null ||
+        (Platform.isAndroid && imageFormat != InputImageFormat.nv21) ||
+        (Platform.isIOS && imageFormat != InputImageFormat.bgra8888)) return null;
 
     // since format is constraint to nv21 or bgra8888, both only have one plane
     if (image.planes.length != 1) return null;
 
     final planeData = InputImageMetadata(
       size: imageSize,
-      rotation: rotation,
-      format: format,
+      rotation: imageRotation,
+      format: imageFormat,
       bytesPerRow: image.planes[0].bytesPerRow,
     );
 
