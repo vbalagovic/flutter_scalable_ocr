@@ -64,7 +64,6 @@ class ScalableOCR extends StatefulWidget {
 }
 
 class ScalableOCRState extends State<ScalableOCR> {
-  final TextRecognizer _textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
   final TextRecognizer _textRecognizer = TextRecognizer();
   final cameraPrev = GlobalKey();
   final thePainter = GlobalKey();
