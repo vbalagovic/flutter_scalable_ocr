@@ -25,3 +25,7 @@ Migrate to support flutrer 3.24.3, upgraded ML kit version, added torch and swit
 ## 2.2.0
 
 Updated formatting
+
+## 2.2.1
+
+Fixed android camera issue
