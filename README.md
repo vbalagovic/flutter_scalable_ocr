@@ -1,5 +1,7 @@
 # Flutter Scalable OCR
 
+`v2.1.1`
+
 > [!IMPORTANT]
 > QUICK NOTE: I know I'm a bit late on issue fixes due to some private problems. 
 Package is not abandoned, all PR-s are welcome and I'll try to fix everything as soon I find some free time. 
@@ -7,8 +9,11 @@ Thanks for the understanding.<br>
 >If there is a significant issue that gives you trouble with the production product, or if there is any way
 you want/can help, you can reach directly to me on vedran.balagovic@gmail.com so maybe we can sort something.
 
-
-`v2.1.1`
+> [!NOTE]
+> UPCOMING FEATURES:
+> - box resizable in real-time by user
+> - show/hide letters on camera feed
+> - ability to save image
 
 Flutter scalable OCR package is a wrapper around [Google ML kit Text Recognition](https://pub.dev/packages/google_mlkit_text_recognition). It tackles the issue of fetching data just from part od a camera and also narowing down the camera viewport which was common problem. To see how it work in real case scenario you can check the app where it was used [Exchange Rate Scanner](https://www.erscanner.com/) and here are some gifs from example project.
 
