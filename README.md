@@ -3,11 +3,14 @@
 `v2.1.1`
 
 > [!IMPORTANT]
-> QUICK NOTE: I know I'm a bit late on issue fixes due to some private problems. 
-Package is not abandoned, all PR-s are welcome and I'll try to fix everything as soon I find some free time. 
-Thanks for the understanding.<br>
->If there is a significant issue that gives you trouble with the production product, or if there is any way
-you want/can help, you can reach directly to me on vedran.balagovic@gmail.com so maybe we can sort something.
+> QUICK NOTE:
+> I know I'm a bit late on issue fixes due to some private problems. 
+> Package is not abandoned, all PR-s are welcome and I'll try to fix everything as soon I find some free time.
+> 
+> Thanks for the understanding.
+> 
+> If there is a significant issue that gives you trouble with the production product, or if there is any way
+> you want/can help, you can reach directly to me on vedran.balagovic@gmail.com so maybe we can sort something.
 
 > [!NOTE]
 > UPCOMING FEATURES:
