@@ -1,7 +1,9 @@
 # Flutter Scalable OCR
 
 ```
-QUICK NOTE: I know I'm a bit late on issue fixes due to some private problems. Package is not abandoned, all PR-s are welcome and I'll try to fix everything as soon I find some free time. Thanks for the understanding.
+QUICK NOTE: I know I'm a bit late on issue fixes due to some private problems. 
+Package is not abandoned, all PR-s are welcome and I'll try to fix everything as soon I find some free time. 
+Thanks for the understanding.
 ```
 
 `v2.1.1`
